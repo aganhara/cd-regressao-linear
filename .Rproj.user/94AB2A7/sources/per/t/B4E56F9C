@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592250019543.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "B4E56F9C",
+    "lastKnownWriteTime" : 0,
+    "last_content_update" : 1592250019543,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "7FC09D1A",
+        "caption" : "previsao_treinamento",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=previsao_treinamento&cache_key=7FC09D1A",
+        "displayedObservations" : 97,
+        "environment" : "",
+        "expression" : "previsao_treinamento",
+        "object" : "previsao_treinamento",
+        "preview" : 0,
+        "totalObservations" : 97,
+        "variables" : 1
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

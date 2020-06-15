@@ -1,0 +1,3 @@
+"0","?predict"
+"0","previsao_de_treinamento <- predict(modelo_ML) %>% as.data.frame()"
+"0","previsao_de_treinamento"

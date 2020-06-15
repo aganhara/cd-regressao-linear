@@ -1,0 +1,4 @@
+"0","# Novo valor de população (10 mil habitantes) - nós não sabemos a previsibilidade para esse valor de entrada"
+"0","novo_dado      = data.frame(c(10, 12, 14, 16, 18, 20))"
+"0","colnames(novo_dado) <- c('Population')"
+"0","novo_dado"

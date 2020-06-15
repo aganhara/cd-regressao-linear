@@ -1,0 +1,3 @@
+"0","data <- read.table(""data.txt"", sep = "","")"
+"0","names(data) <- c(""Population"", ""Profit"")"
+"0","head(data)"

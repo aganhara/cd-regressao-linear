@@ -1,0 +1,297 @@
+---
+title: "Exercício Computacional I"
+author: "Anderson Ganhara"
+date: "6/15/2020"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+```
+
+Considere o conjunto de dados data.txt, que organiza em um arquivo de texto dados sobre os lucros de diversas empresas e a população da cidade na qual a respectiva empresa se localiza. Nosso objetivo, é conduzir uma análise de regressão linear simples para que possamos construir um modelo que busque explicar os dados que temos acesso.
+A variável explanatória, i.e., feature ou variável de entrada, é o conjunto de dados populacionais das cidades (baseados em 10,000 habitantes) em uma região analisada nos USA, enquanto a variável dependente, ou de saída, consiste nos lucros declarados pelas empresas (baseados em uma escala de $10,000 dólares) que atuam nas cidades da região analisada. De forma analítica, a função hipótese candidata no caso do modelo de regressão linear é dada por:
+ˆ
+hθ (x) = θ0 + θ1 x1 (1.5)
+Considere a função custo retratada pelo erro quadrático médio para construção do modelo de ML. Abaixo, seguem os itens que devemos solucionar neste desenvolvimento, visando alcançar o objetivo do exercício:
+
+Dicas para o Exercício
+– Escolha o ambiente de desenvolvimento e a linguagem que for mais confortável para você (e.g.,
+R/RStudio, Python/Jupyter, MATLAB, Java, entre outras), mas não deixe de visitar soluções
+diferentes, conversando com outros alunos, por exemplo).
+– Independente da linguagem, entenda o algoritmo e interprete-o como ferramenta, colocando o
+enfoque sobre a solução do problema.
+
+1) Faça a análise exploratória das variáveis de entrada e saída. Utilize os nomes population e profit.
+```{r}
+data <- read.table("data.txt", sep = ",")
+names(data) <- c("Population", "Profit")
+head(data)
+```
+```{r}
+summary(data)
+# Utiliza funções gráficas simples para verificar a relação entre variáveis: população (population) e lucro (profit)
+# ?plot
+plot(data$Population, data$Profit, main = 'Gráfico de Dispersão - População vs Lucro', 
+     xlab = 'População', ylab = 'Lucro', pch = 1, col = 'blue')
+# ?legend
+legend("topright",legend = c('Dados'), col = c('blue'), pch = c(1)) 
+# ?grid 
+grid()
+```
+
+2) Construa e treine o modelo preditivo de ML baseado em regressão linear simples.
+```{r}
+modelo_ML <- lm(profit ~ population, data = data)
+modelo_ML
+```
+
+3) Realize as predições do modelo sobre os dados detreinamento e calcule a média de seus resíduos.
+
+```{r}
+# Descobrindo o que tem no modelo
+names(modelo_ML)
+
+# Coeficientes
+modelo_ML$coefficients[1]
+modelo_ML$coefficients[2]
+
+# Resíduos do modelo (diferença entre o modelo e os dados de treinamento)
+modelo_ML$residuals
+
+# Obtenha a média dos resíduos
+media_residuos = mean(modelo_ML$residuals)
+media_residuos
+```
+
+4) Qual seria a predição de lucro de uma empresa,considerando uma cidade na região analisadas
+que conta com 100,000 habitantes?
+```{r}
+?predict
+previsao_de_treinamento <- predict(modelo_ML) %>% as.data.frame()
+previsao_de_treinamento
+```
+`
+```{r}
+x <- data$Population
+y <- data$Profit
+
+# Plotando os dados de treinamento 
+plot(data$Population,data$Profit, main = 'Gráfico de Dispersão - População vs Lucro', 
+     xlab = 'População (baseado 10,000 hab)', ylab = 'Lucro (baseado em $10,000 dólares)', pch = 1, col = 'blue')
+
+legend("topright",legend = c('Dados'), col = c('blue'), pch = c(1)) 
+grid() 
+
+# Plotando a linha de regressão
+?abline
+# dica: função abline(a,b)
+# 1) a -> intercept do modelo de regressão
+# 2) b -> coeficiente da reta do modelo de regressão
+abline(modelo_ML$coefficients[1],modelo_ML$coefficients[2],col = 'red')
+```
+```{r}
+# Modelo de regressão
+h = modelo_ML$coefficients[1] + modelo_ML$coefficients[2]*x
+# Visualização
+ggplot(data, 
+       aes(x = Population, y = Profit)) + 
+  geom_point(size=1.5, aes(colour = "Dados de Treinamento")) + 
+  geom_line(aes(x = x, y = h, colour = "Modelo de Regressão"),linetype = 1, size=1) +
+  scale_colour_manual(name="Legenda", values=c("blue", "red")) + 
+  xlab('População (baseada em 10.000)') + ylab('Lucro (baseado em $10.000)')  +
+  ggtitle("Gráfico de Dispersão - População vs Lucro")
+```
+
+```{r}
+# Novo valor de população (10 mil habitantes) - nós não sabemos a previsibilidade para esse valor de entrada
+novo_dado      = data.frame(c(10, 12, 14, 16, 18, 20))
+colnames(novo_dado) <- c('Population')
+novo_dado
+predicao_teste <- predict(modelo_ML, novo_dado)
+predicao_teste <- data.frame(novo_dado*10000, predicao_teste*10000)
+names(predicao_teste) <- c('População','Predições (dólares)')
+predicao_teste
+```
+
+Para a população de 100,000 habitantes a predição seria de $80,345.56.
+
+5) Implemente o algoritmo do gradiente descendente.
+```{r}
+# Implementação do algoritmo do gradiente descendente para obtenção do mesmo resultado da função lm do R
+theta0 = 0
+theta1 = 0
+theta  = c(theta0,theta1)
+# Criando funções
+Cost_computation <- function(x, y, theta){
+  
+  # Verificação do número de exemplos de treinamento 
+  m = length(y)
+  
+  # Inicialização do Custo
+  J = 0
+  
+  # Cômputo do custo a partir das informações fornecidas:
+  # i)   matriz de design
+  # ii)  rótulos ou respostas
+  # iii) parâmetros inicializados
+  
+  # Parâmetros - de acordo com o modelo de regressão linear
+  Theta0 = theta[1]
+  Theta1 = theta[2]
+  
+  # Função hipótese candidata de acordo com o modelo linear
+  h = Theta0 + Theta1*x    
+  
+  # Cômputo do custo (repare na versão vetorizada com Matlab)
+  Cost = sum((h - y)^2)
+  
+  # Ponderação do custo pela quantidade de exemplos de treinamento
+  J = (1/(2*m))*Cost
+}
+
+# Cálculo da função custo para esses valores do vetor de parâmetros theta
+Custo = Cost_computation(x,y,theta)
+Custo
+```
+```{r}
+# Algoritmo do Gradiente Descendente ------------------------------------------------------------
+
+# Inicializações relacionada ao gradiente descendente
+num_iters     = 15000;
+learning_rate = 0.01;
+
+Algoritmo_GD <- function(X, y, theta, learning_rate, num_iters){
+  
+  # Verificação do número de exemplos de treinamento 
+  m = length(y)
+  
+  # Uso da variável alpha = taxa de aprendizagem 
+  alpha = learning_rate
+  
+  # Loop para iterações do algoritmo GD
+  for (i in 1:num_iters){
+    # ================================================================================
+    h      = theta[1] + theta[2]*x                   # Função hipótese 
+    Theta0 = theta[1]                                # Parâmetro (bias)
+    Theta1 = theta[2]                                # Parâmetro da característica
+    Theta0 = Theta0 - alpha*(1/m)*sum((h - y))       # Algoritmo GD (theta 0) 
+    Theta1 = Theta1 - alpha*(1/m)*sum((h - y)*x)     # Algoritmo GD (theta 1)
+    theta  = c(Theta0, Theta1)                       # Composição de vetor de parâmetro
+    # print(theta)
+  }                         
+  # ================================================================================
+  theta
+}
+theta_GD <- Algoritmo_GD(x, y, theta, learning_rate, num_iters)
+theta_GD
+```
+
+
+6) Solucione o problema de regressão linear com as equações normais e faça um comparativo.
+
+```{r}
+# ===============================================================================================
+# Uso das equações normais para solução da regressão linear simples
+# Repare que nós usamos a matriz de design com a característica unitária,
+# pois queremos encontrar o parâmetro theta_0 ou intercept do modelo
+
+# Característica unitária
+size_data = dim(data)
+ones_data = replicate(size_data[1],1)
+
+# Matriz de Design
+X = data.frame(ones_data,x)
+X = as.matrix(X)
+View(X)
+
+theta_solution_norm_equations = solve(t(X) %*% X) %*% (t(X) %*% y) 
+theta_0_norm_eq = theta_solution_norm_equations[1]
+theta_1_norm_eq = theta_solution_norm_equations[2]
+theta_0_norm_eq
+theta_1_norm_eq
+```
+
+
+7) Compare os resultados do modelo construído com os parâmetros obtidos com o algoritmo GD.
+
+```{r}
+# ===============================================================================================
+# Descrição detalhada do summary do modelo ------------------------------------------------------
+
+# Summary do modelo - avaliando sua performance e detalhes
+summary(modelo_ML)
+
+# Equação de Regressão
+# y = a + bx (simples)
+# y = a + b0x0 + b1x1 (múltipla)
+
+# Resíduos
+# Diferença entre os valores observados de uma variável e seus valores previstos
+# Seus resíduos devem se parecer com uma distribuição normal, o que indica
+# que a média entre os valores previstos e os valores observados é próximo de 0 (o que é bom)
+
+# Coeficiente - Intercept - a (alfa)
+# Valor de a na equação de regressão
+
+# Coeficientes - Nomes das variáveis - b (beta)
+# Valor de b na equação de regressão
+
+# Obs: A questão é que lm() ou summary() têm diferentes convenções de 
+# rotulagem para cada variável explicativa. 
+# Em vez de escrever slope_1, slope_2, .... 
+# Eles simplesmente usam o nome da variável em qualquer saída para 
+# indicar quais coeficientes pertencem a qual variável.
+
+# Erro Padrão
+# Medida de variabilidade na estimativa do coeficiente a (alfa). O ideal é que este valor 
+# seja menor que o valor do coeficiente, mas nem sempre isso irá ocorrer.
+
+# Asteriscos 
+# Os asteriscos representam os níveis de significância de acordo com o p-value.
+# Quanto mais estrelas, maior a significância.
+# Atenção --> Muitos astericos indicam que é improvável que não exista 
+# relacionamento entre as variáveis.
+
+# Valor t
+# Define se coeficiente da variável é significativo ou não para o modelo. 
+# Ele é usado para calcular o p-value e os níveis de significância.
+
+# p-value
+# O p-value representa a probabilidade que a variável não seja relevante. 
+# Deve ser o menor valor possível. 
+# Se este valor for realmente pequeno, o R irá mostrar o valor 
+# como notação científica
+
+# Significância
+# São aquelas legendas próximas as suas variáveis
+# Espaço em branco - ruim
+# Pontos - razoável
+# Asteriscos - bom
+# Muitos asteriscos - muito bom
+
+# Residual Standar Error
+# Este valor representa o desvio padrão dos resíduos
+
+# Degrees of Freedom
+# É a diferença entre o número de observações na amostra de treinamento 
+# e o número de variáveis no seu modelo
+
+# R-squared (coeficiente de determinação - R^2)
+# Ajuda a avaliar o nível de precisão do nosso modelo. 
+# Quanto maior, melhor, sendo 1 o valor ideal.
+
+# F-statistics
+# É o teste F do modelo. Esse teste obtém os parâmetros do nosso modelo 
+# e compara com um modelo que tenha menos parâmetros.
+# Em teoria, um modelo com mais parâmetros tem um desempenho melhor. 
+
+# Se o seu modelo com mais parâmetros NÃO tiver perfomance
+# melhor que um modelo com menos parâmetros, o valor do p-value será bem alto. 
+
+# Se o modelo com mais parâmetros tiver performance
+# melhor que um modelo com menos parâmetros, o valor do p-value será mais baixo.
+
+# Lembre-se que correlação não implica causalidade
+```
+

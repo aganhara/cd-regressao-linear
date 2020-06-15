@@ -1,0 +1,6 @@
+"0","x <- data$Population"
+"0","y <- data$Profit"
+"0",""
+"0","# Plotando os dados de treinamento "
+"0","plot(data$Population,data$Profit, main = 'Gráfico de Dispersão - População vs Lucro', "
+"0","     xlab = 'População (baseado 10,000 hab)', ylab = 'Lucro (baseado em $10,000 dólares)', pch = 1, col = 'blue')"

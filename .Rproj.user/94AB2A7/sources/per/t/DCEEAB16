@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592249021975.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3966105070",
+    "id" : "DCEEAB16",
+    "lastKnownWriteTime" : 1587800118,
+    "last_content_update" : 1587800118,
+    "path" : "~/Documents/Ciência de Dados e Decisões/Aula 2/Exercício Computacional - 1/R/Exercicio_Computacional_1.R",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "292,0",
+        "scrollLine" : "263"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

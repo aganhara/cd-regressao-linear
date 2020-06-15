@@ -1,0 +1,26 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1592248386660.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2800517671",
+    "id" : "872258C0",
+    "lastKnownWriteTime" : 1592250915,
+    "last_content_update" : 1592250915631,
+    "path" : "~/Documents/Ciência de Dados e Decisões/Regressão Linear/Exercício Computacional I.Rmd",
+    "project_path" : "Exercício Computacional I.Rmd",
+    "properties" : {
+        "cursorPosition" : "294,50",
+        "scrollLine" : "256",
+        "tempName" : "Untitled1"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}
