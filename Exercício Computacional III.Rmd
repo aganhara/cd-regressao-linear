@@ -1,0 +1,43 @@
+---
+title: "Exercício Computacional III"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(MASS)
+data <- Boston
+
+data
+
+modelo_ML <- lm(medv ~ crim + rm + lstat, data = data)
+summary(modelo_ML)
+
+previsao_treinamento <- predict(modelo_ML) %>% as.data.frame()
+previsao_treinamento
+names(modelo_ML)
+
+modelo_ML$coefficients
+modelo_ML$residuals
+
+x <- data$crim
+x_1 <- data$rm
+x_2 <- data$lstat
+y <- data$medv
+
+h = modelo_ML$coefficients[1] + modelo_ML$coefficients[2]*x + modelo_ML$coefficients[3]*x_1 + modelo_ML$coefficients[4]+x_2
+
+# Novo valor de população (10 mil habitantes) - nós não sabemos a previsibilidade para esse valor de entrada
+novo_dado      = data.frame(crim = c(0.15), rm = c(5), lstat = c(20))
+#colnames(novo_dado) <- c('lstat')
+novo_dado
+predicao_teste <- predict(modelo_ML, novo_dado)
+predicao_teste <- data.frame(novo_dado, predicao_teste*1000)
+names(predicao_teste) <- c('Índice de crimes', 'Número de quartos', 'Porcetagem Baixa Renda', 'Predições (dólares)')
+predicao_teste
+
+```
+

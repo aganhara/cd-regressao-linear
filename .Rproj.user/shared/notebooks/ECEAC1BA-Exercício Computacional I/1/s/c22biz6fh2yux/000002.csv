@@ -1,3 +1,0 @@
-"0","modelo_ML <- lm(profit ~ population, data = data)"
-"2","Error in eval(predvars, data, env) : object 'profit' not found
-"

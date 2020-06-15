@@ -1,7 +1,0 @@
-"0",""
-"0","# Plotando a linha de regressão"
-"0","?abline"
-"0","# dica: função abline(a,b)"
-"0","# 1) a -> intercept do modelo de regressão"
-"0","# 2) b -> coeficiente da reta do modelo de regressão"
-"0","abline(modelo_ML$coefficients[1],modelo_ML$coefficients[2],col = 'red')"

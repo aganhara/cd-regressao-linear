@@ -1,0 +1,224 @@
+---
+title: "Exercício Computacional II"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1 - Faça a exploração dos dados e a síntese sobre suas principais variáveis explanatórias.
+```{r}
+library(MASS)
+library(rlang)
+library(tidyverse)
+data <- Boston
+summary(data)
+```
+```{r}
+
+# Utiliza funções gráficas simples para verificar a relação entre variáveis: 
+# ?plot
+plot(data$lstat, data$medv, main = 'Gráfico de Dispersão - lstat vs medv', 
+     xlab = 'lstat', ylab = 'Preço mediano da casa', pch = 1, col = 'blue')
+# ?legend
+legend("topright",legend = c('Dados'), col = c('blue'), pch = c(1)) 
+# ?grid 
+grid()
+
+
+```
+
+2 - 
+
+```{r}
+modelo_ML <- lm(medv ~ lstat, data)
+x <- data$lstat
+y <- data$medv
+
+summary(modelo_ML)
+```
+
+3 -
+
+```{r}
+# Coeficientes
+modelo_ML$coefficients[1]
+modelo_ML$coefficients[2]
+
+# Resíduos do modelo (diferença entre o modelo e os dados de treinamento)
+modelo_ML$residuals
+
+# Obtenha a média dos resíduos
+media_residuos = mean(modelo_ML$residuals)
+media_residuos
+```
+```{r}
+previsao_treinamento <- predict(modelo_ML) %>% as.data.frame()
+# Modelo de regressão
+h = modelo_ML$coefficients[1] + modelo_ML$coefficients[2]*x
+
+# Visualização
+ggplot(data, 
+       aes(x = lstat, y = medv)) + 
+  geom_point(size=3, aes(colour = "Dados de Treinamento")) + 
+  geom_line(aes(x = x, y = h, colour = "Modelo de Regressão"),linetype = 1, size=1.5) +
+  scale_colour_manual(name="Legenda", values=c("blue", "red")) + 
+  xlab('População (baseada em 10.000)') + ylab('Lucro (baseado em $10.000)')  +
+  ggtitle("Gráfico de Dispersão - População vs Lucro")
+
+```
+
+
+4 - 
+```{r}
+# ===============================================================================================
+# Predição do Modelo para novos dados ------------------------------------------------------
+
+# Novo valor de população (10 mil habitantes) - nós não sabemos a previsibilidade para esse valor de entrada
+novo_dado      = data.frame(c(10, 15, 20, 25, 30, 35))
+colnames(novo_dado) <- c('lstat')
+novo_dado
+predicao_teste <- predict(modelo_ML, novo_dado)
+predicao_teste <- data.frame(novo_dado, predicao_teste*1000)
+names(predicao_teste) <- c('Porcentagem Baixa renda', 'Predições (dólares)')
+predicao_teste
+```
+
+Para uma porcentagem de 25% a estimativa seria de 10,802.607
+
+
+5 - 
+```{r}
+# ------------------------------------------------------------------------------------------------------
+# Implementação do algoritmo do gradiente descendente para obtenção do mesmo resultado da função lm do R
+theta0 = 0
+theta1 = 0
+theta  = c(theta0,theta1)
+# Criando funções
+Cost_computation <- function(x, y, theta){
+  
+  # Verificação do número de exemplos de treinamento 
+  m = length(y)
+  
+  # Inicialização do Custo
+  J = 0
+  
+  # Cômputo do custo a partir das informações fornecidas:
+  # i)   matriz de design
+  # ii)  rótulos ou respostas
+  # iii) parâmetros inicializados
+  
+  # Parâmetros - de acordo com o modelo de regressão linear
+  Theta0 = theta[1]
+  Theta1 = theta[2]
+  
+  # Função hipótese candidata de acordo com o modelo linear
+  h = Theta0 + Theta1*x    
+  
+  # Cômputo do custo (repare na versão vetorizada com Matlab)
+  Cost = sum((h - y)^2)
+  
+  # Ponderação do custo pela quantidade de exemplos de treinamento
+  J = (1/(2*m))*Cost
+}
+
+# Cálculo da função custo para esses valores do vetor de parâmetros theta
+Custo = Cost_computation(x,y,theta)
+Custo
+
+# -----------------------------------------------------------------------------------------------
+# Algoritmo do Gradiente Descendente ------------------------------------------------------------
+
+# Inicializações relacionada ao gradiente descendente
+num_iters     = 50000;
+learning_rate = 0.001;
+
+Algoritmo_GD <- function(X, y, theta, learning_rate, num_iters){
+  
+  # Verificação do número de exemplos de treinamento 
+  m = length(y)
+  
+  # Uso da variável alpha = taxa de aprendizagem 
+  alpha = learning_rate
+  
+  # Loop para iterações do algoritmo GD
+  for (i in 1:num_iters){
+    # ================================================================================
+    h      = theta[1] + theta[2]*x                   # Função hipótese 
+    Theta0 = theta[1]                                # Parâmetro (bias)
+    Theta1 = theta[2]                                # Parâmetro da característica
+    Theta0 = Theta0 - alpha*(1/m)*sum((h - y))       # Algoritmo GD (theta 0) 
+    Theta1 = Theta1 - alpha*(1/m)*sum((h - y)*x)     # Algoritmo GD (theta 1)
+    theta  = c(Theta0, Theta1)                       # Composição de vetor de parâmetro
+    # print(theta)
+  }                         
+  # ================================================================================
+  theta
+}
+theta_GD <- Algoritmo_GD(x, y, theta, learning_rate, num_iters)
+theta_GD
+```
+
+6 - 
+```{r}
+# ===============================================================================================
+# Uso das equações normais para solução da regressão linear simples
+# Repare que nós usamos a matriz de design com a característica unitária,
+# pois queremos encontrar o parâmetro theta_0 ou intercept do modelo
+
+# Característica unitária
+size_data = dim(data)
+ones_data = replicate(size_data[1],1)
+
+# Matriz de Design
+X = data.frame(ones_data,x)
+X = as.matrix(X)
+View(X)
+
+theta_solution_norm_equations = solve(t(X) %*% X) %*% (t(X) %*% y) 
+theta_0_norm_eq = theta_solution_norm_equations[1]
+theta_1_norm_eq = theta_solution_norm_equations[2]
+theta_0_norm_eq
+theta_1_norm_eq
+```
+
+
+7 - 
+```{r}
+# ===============================================================================================
+# Descrição detalhada do summary do modelo ------------------------------------------------------
+
+# Summary do modelo - avaliando sua performance e detalhes
+summary(modelo_ML)
+
+# Resíduos
+# Diferença entre os valores observados de uma variável e suas predições
+  
+# Coeficiente - Intercept - a (alfa)
+# Valor de a na equação de regressão
+  
+# Coeficientes - Nomes das variáveis - b (beta)
+# Valor de b na equação de regressão
+
+# Asteriscos 
+# Os asteriscos representam os níveis de significância de acordo com o p-value para cara variável exploratória.
+# Quanto mais estrelas, maior a significância.
+
+# Valor t
+# Ele é usado para calcular o p-value e os níveis de significância.
+
+# p-value
+# O p-value representa a probabilidade que a variável não seja relevante. 
+# Deve ser o menor valor possível. 
+
+
+# R-squared (coeficiente de determinação - R^2)
+# Ajuda a avaliar a precisão explicativa do modelo. 
+# Quanto maior, melhor, sendo 1 o valor ideal.
+
+# Lembre-se que correlação não implica causalidade
+```
+
+
+

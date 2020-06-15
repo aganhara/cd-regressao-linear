@@ -1,4 +1,0 @@
-"0","predicao_teste <- predict(modelo_ML, novo_dado)"
-"0","predicao_teste <- data.frame(novo_dado*10000, predicao_teste*10000)"
-"0","names(predicao_teste) <- c('População','Predições (dólares)')"
-"0","predicao_teste"
